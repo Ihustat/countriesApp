@@ -30,34 +30,20 @@ function displayCountry(data, className = '') {
     countriesContainer.style.opacity = '1';
 };
 
-function getCountryAndBordersData(country) {
-    const request = new XMLHttpRequest();
-    request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
-    request.send();
-    request.addEventListener('load', function() {
-        const [data] = JSON.parse(this.responseText);
+function getCountryData(country) {
+    fetch(`https://restcountries.com/v3.1/name/${country}`)
+    .then(response => response.json())
+    .then(data => {
+        displayCountry(data[0]);
+        const firstNeighbour = data[0].borders[0];
 
-        displayCountry(data);
-
-        //get neighbours
-
-        const [firstNeighbour] = data.borders;
-
-        if (!firstNeighbour) return;
-
-        const request1 = new XMLHttpRequest();
-        request1.open('GET', `https://restcountries.com/v3.1/alpha/${firstNeighbour}`);
-        request1.send();
-
-        request1.addEventListener('load', function() {
-            const [data1] = JSON.parse(this.responseText);
-
-            displayCountry(data1, 'neighbour');
-        });
-    });
+        return fetch(`https://restcountries.com/v3.1/alpha/${firstNeighbour}`);
+    })
+    .then(response => response.json())
+    .then(data => displayCountry(data[0], ' neighbour'));
 };
 
-getCountryAndBordersData('russia');
+getCountryData('russia');
 
 
 
