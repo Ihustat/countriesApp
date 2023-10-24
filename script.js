@@ -27,23 +27,36 @@ function displayCountry(data, className = '') {
     `;
 
     countriesContainer.insertAdjacentHTML('beforeend', html);
-    countriesContainer.style.opacity = '1';
+};
+
+function displayError(message) {
+    countriesContainer.insertAdjacentText('beforeend', message);
+};
+
+function getData(url) {
+    return fetch(url)
+    .then(response => {
+        if(!response.ok) throw new Error(`Country is not found. Error ${response.status}.`);
+        return response.json()
+    })
 };
 
 function getCountryData(country) {
-    fetch(`https://restcountries.com/v3.1/name/${country}`)
-    .then(response => response.json())
+    getData(`https://restcountries.com/v3.1/name/${country}`)
     .then(data => {
         displayCountry(data[0]);
         const firstNeighbour = data[0].borders[0];
 
-        return fetch(`https://restcountries.com/v3.1/alpha/${firstNeighbour}`);
+       return getData(`https://restcountries.com/v3.1/alpha/${firstNeighbour}`)
     })
-    .then(response => response.json())
-    .then(data => displayCountry(data[0], ' neighbour'));
+    .then(data => displayCountry(data[0], ' neighbour'))
+    .catch(e => displayError(`Something goes wrong: ${e.message}`))
+    .finally(() => countriesContainer.style.opacity = '1')
 };
 
-getCountryData('russia');
+btn.addEventListener('click', () => {
+    getCountryData('russia');
+});
 
 
 
