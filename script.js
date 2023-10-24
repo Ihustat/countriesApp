@@ -33,6 +33,16 @@ function displayError(message) {
     countriesContainer.insertAdjacentText('beforeend', message);
 };
 
+function displayCountryByGPS(lng, lat) {
+    fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`)
+    .then(response => {
+        if (!response.ok) throw new Error();
+        return response.json()
+    })
+    .then(data => getCountryData(data.countryName))
+    .catch(() => console.log('Error'));
+};
+
 function getData(url) {
     return fetch(url)
     .then(response => {
@@ -57,6 +67,8 @@ function getCountryData(country) {
 btn.addEventListener('click', () => {
     getCountryData('russia');
 });
+
+displayCountryByGPS(2.358, 48.857);
 
 
 
